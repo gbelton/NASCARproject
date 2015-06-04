@@ -12,5 +12,6 @@ the command **load(NASCARdata.RDa)**.
 
 The file _updater.R_ checks for new races and adds them to the database.
 
-
+There is a codebook which describes the variables in the database. It is available 
+in three different formats: Markdown, pdf, and html.
 
