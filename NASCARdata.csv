@@ -16295,8 +16295,6 @@
 19,2015-07-19,"Loudon",43,1.058,"P",318,7,108.504,10,"Jeb Burton",41,36,"#26","Toyota","3/0",239,0,"Running",30.1,61655,"BK Racing"
 19,2015-07-19,"Loudon",43,1.058,"P",318,7,108.504,10,"Alex Bowman",42,40,"#7","Chevrolet","2/0",230,0,"Running",30.2,57655,"Tommy Baldwin Racing"
 19,2015-07-19,"Loudon",43,1.058,"P",318,7,108.504,10,"J.J. Yeley",43,39,"#23","Toyota","0/0",202,0,"rear gear",27,54155,"BK Racing"
-<<<<<<< HEAD
-=======
 20,2015-07-26,"Indianapolis",43,2.5,"P",410,9,131.656,16,"Kyle Busch",1,9,"#18","Toyota","47/4",164,19,"Running",131.3,424191,"Joe Gibbs Racing"
 20,2015-07-26,"Indianapolis",43,2.5,"P",410,9,131.656,16,"Joey Logano",2,2,"#22","Ford","43/1",164,28,"Running",117.9,367408,"Team Penske"
 20,2015-07-26,"Indianapolis",43,2.5,"P",410,9,131.656,16,"Kevin Harvick",3,6,"#4","Chevrolet","43/2",164,75,"Running",135.5,356825,"Stewart-Haas Racing"
@@ -16856,4 +16854,3 @@
 32,2015-10-25,"Talladega",43,2.66,"P",521,3,167.311,30,"Timmy Hill",41,32,"#62","Ford","0/0",168,0,"electrical",26.4,62805,"Premium Motorsports"
 32,2015-10-25,"Talladega",43,2.66,"P",521,3,167.311,30,"Justin Allgaier",42,39,"#51","Chevrolet","2/0",130,0,"engine",49.7,66805,"HScott Motorsports"
 32,2015-10-25,"Talladega",43,2.66,"P",521,3,167.311,30,"Ryan Blaney",43,9,"#21","Ford","0/0",84,0,"engine",53.8,55305,"Wood Brothers Racing"
->>>>>>> e7981b0400be0fac253599bb8eaa13052352e182
