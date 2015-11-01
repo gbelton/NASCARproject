@@ -10,6 +10,8 @@ then outputs as _NASCARdata.csv_.
 There is also a _NASCARdata.RDa_ file which can be read directly into R using 
 the command **load(NASCARdata.RDa)**.
 
-Next step is to write an R script to update the existing data frame as new races 
-become available. 
+The file _updater.R_ checks for new races and adds them to the database.
+
+There is a codebook which describes the variables in the database. It is available 
+in three different formats: Markdown, pdf, and html.
 
