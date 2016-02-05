@@ -1,0 +1,150 @@
+---
+title: "Modify NASCAR.data for machine learning"
+author: "Gerald Belton"
+date: "November 27, 2015"
+output: html_document
+---
+Start by reducing NASCAR.data to just the variables we will use for the machine 
+learning process:
+```{r}
+# Subset NASCAR.data to produce training data set
+# Load existing database
+load("NASCARdata.RDa")
+keepvars <- c("Date", "Site", "Driver", "Start", "Rating", "Finish")
+training.data <- NASCAR.data[keepvars]
+
+#convert strings to factors
+training.data$Site <- as.factor(training.data$Site)
+training.data$Driver <- as.factor(training.data$Driver)
+#training.data$CarNumber <- as.factor(training.data$CarNumber)
+
+```
+
+We're going to nead some information on track type:
+```{r}
+tracks <- read.csv("NASCARTracks.csv")
+
+```
+
+Classify each track according to NASCAR and AccuPredict classifications
+```{r}
+require(plyr)
+training.data = join(training.data,tracks,by='Site')    
+```
+
+For each race starting with 2006, calculate each driver's previous average 
+finish position.
+```{r}
+
+for (row in 1:nrow(training.data)) {
+     dvr <- training.data$Driver[row]
+     Dte <- training.data$Date[row]
+     temp <- training.data[ which(training.data$Driver==dvr &  
+                                       training.data$Date<Dte), ]
+     training.data$CareerAvg[row] <- mean(temp$Finish)
+     
+    
+}
+#CareerAvg contains the driver's average finish for his career up to this race
+```
+
+Create new column Avg10 which contains the driver's average in his last ten 
+starts.
+```{r}
+
+
+for (row in 1:nrow(training.data)) {
+     dvr <- training.data$Driver[row]
+     Dte <- training.data$Date[row]
+     temp <- training.data[ which(training.data$Driver==dvr &  
+                                       training.data$Date<Dte), ]
+     training.data$Avg10[row] <- mean(tail(temp$Finish,10))
+     
+    
+}
+```
+
+Create new column Avg5 which contains the driver's average in his last five 
+starts.
+```{r}
+
+
+for (row in 1:nrow(training.data)) {
+     dvr <- training.data$Driver[row]
+     Dte <- training.data$Date[row]
+     temp <- training.data[ which(training.data$Driver==dvr &  
+                                       training.data$Date<Dte), ]
+     training.data$Avg5[row] <- mean(tail(temp$Finish,5))
+     
+    
+}
+```
+
+Now let's calculate the drivers average finish at the same track
+```{r}
+
+for (row in 1:nrow(training.data)) {
+     dvr <- training.data$Driver[row]
+     Dte <- training.data$Date[row]
+     trk <- training.data$Site[row]
+     temp <- training.data[ which(training.data$Driver==dvr & 
+                                       training.data$Date<Dte &
+                                       training.data$Site == trk), ]
+     training.data$TrackAvg[row] <- mean(temp$Finish)
+     
+    
+}
+```
+
+Calculate driver's previous average by NASCAR track type
+```{r}
+
+for (row in 1:nrow(training.data)) {
+     dvr <- training.data$Driver[row]
+     Dte <- training.data$Date[row]
+     NSC <- training.data$NASCAR[row]
+     temp <- training.data[ which(training.data$Driver==dvr & 
+                                       training.data$Date<Dte &
+                                       training.data$NASCAR == NSC), ]
+     training.data$NTypeAvg[row] <- mean(temp$Finish)
+     
+    
+}
+```
+
+Calculate driver's previous average by AccuPredict track type
+```{r}
+
+for (row in 1:nrow(training.data)) {
+     dvr <- training.data$Driver[row]
+     Dte <- training.data$Date[row]
+     ACC <- training.data$AccuPredict[row]
+     temp <- training.data[ which(training.data$Driver==dvr & 
+                                       training.data$Date<Dte &
+                                       training.data$AccuPredict == ACC), ]
+     training.data$AccuPredictAvg[row] <- mean(temp$Finish)
+     
+    
+}
+```
+
+Create new column RtgAvg10 which contains the driver's average Rating in his 
+last ten starts.
+```{r}
+
+
+for (row in 1:nrow(training.data)) {
+     dvr <- training.data$Driver[row]
+     Dte <- training.data$Date[row]
+     temp <- training.data[ which(training.data$Driver==dvr &  
+                                       training.data$Date<Dte), ]
+     training.data$RtgAvg10[row] <- mean(tail(temp$Rating,10))
+     
+    
+}
+```
+
+Save training data for later use
+```{r}
+save(training.data, file="training-data.RData")
+```

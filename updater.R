@@ -16,7 +16,7 @@ GetRaces <- function(year) {
      url <- paste("http://racing-reference.info/raceyear/", 
                   as.character(year), "/W", sep = "")
      
-     races <- html(url) %>%
+     races <- read_html(url) %>%
           html_node(".tb:nth-child(4)") %>%
           html_table()
      races <- filter(races, complete.cases(races))
@@ -33,7 +33,7 @@ GetDrivers <- function(year, race) {
                   "sked_id=",
                   as.character(year),
                   sprintf("%03d", race), sep="")
-     drivers <- html(url) %>%
+     drivers <- read_html(url) %>%
           html_node(".table-large") %>%
           html_table()
      names(drivers)[3] <- "CarNumber"
