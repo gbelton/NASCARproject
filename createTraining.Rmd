@@ -13,6 +13,7 @@ load("NASCARdata.RDa")
 keepvars <- c("Date", "Site", "Driver", "Start", "Rating", "Finish")
 training.data <- NASCAR.data[keepvars]
 
+
 #convert strings to factors
 training.data$Site <- as.factor(training.data$Site)
 training.data$Driver <- as.factor(training.data$Driver)
