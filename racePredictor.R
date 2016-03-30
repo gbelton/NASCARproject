@@ -7,14 +7,14 @@
 
 predictNASCAR <- function(date="2016-02-21", track="Daytona"){
 #Load needed libraries
-library(dplyr)
+library(plyr)
 library(caret)
 library(gbm)
 
 #Load database
-load("~/NASCAR-project/training-data.RData")
-NASCARdata <- training.data
-remove(training.data)
+load("~/NASCAR-project/NASCARdata.RDa")
+NASCARdata <- NASCAR.data
+
 
 #Reduce to only necessary variables
 keepvars <- c("Date", "Site", "Driver", "Start", "Rating", "Finish")

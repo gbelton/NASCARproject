@@ -1,0 +1,132 @@
+---
+title: "Modify NASCAR.data for machine learning"
+author: "Gerald Belton"
+date: "November 27, 2015"
+output: html_document
+---
+Start by reducing NASCAR.data to just the variables we will use for the machine 
+learning process:
+```{r}
+# Subset NASCAR.data to produce training data set
+# Load existing database
+load("NASCARdata.RDa")
+keepvars <- c("Date", "Site", "Driver", "CarNumber", "Finish")
+NASCAR.data <- NASCAR.data[keepvars]
+
+#convert strings to factors
+NASCAR.data$Site <- as.factor(NASCAR.data$Site)
+NASCAR.data$Driver <- as.factor(NASCAR.data$Driver)
+NASCAR.data$CarNumber <- as.factor(NASCAR.data$CarNumber)
+
+```
+
+We're going to nead some information on track type:
+```{r}
+tracks <- read.csv("NASCARTracks.csv")
+
+```
+
+Classify each track according to NASCAR and AccuPredict classifications
+```{r}
+require(plyr)
+NASCAR.data = join(NASCAR.data,tracks,by='Site')    
+```
+
+
+
+
+For each race starting with 2006, calculate each driver's previous average 
+finish position.
+```{r}
+
+for (row in 1:nrow(NASCAR.data)) {
+     dvr <- NASCAR.data$Driver[row]
+     Dte <- NASCAR.data$Date[row]
+     temp <- NASCAR.data[ which(NASCAR.data$Driver==dvr &  
+                                       NASCAR.data$Date<Dte), ]
+     NASCAR.data$CareerAvg[row] <- mean(temp$Finish)
+     
+    
+}
+#CareerAvg contains the driver's average finish for his career up to this race
+```
+
+Create new column Avg10 which contains the driver's average in his last ten 
+starts.
+```{r}
+
+
+for (row in 1:nrow(NASCAR.data)) {
+     dvr <- NASCAR.data$Driver[row]
+     Dte <- NASCAR.data$Date[row]
+     temp <- NASCAR.data[ which(NASCAR.data$Driver==dvr &  
+                                       NASCAR.data$Date<Dte), ]
+     NASCAR.data$Avg10[row] <- mean(tail(temp$Finish,10))
+     
+    
+}
+```
+
+Create new column Avg5 which contains the driver's average in his last five 
+starts.
+```{r}
+
+
+for (row in 1:nrow(NASCAR.data)) {
+     dvr <- NASCAR.data$Driver[row]
+     Dte <- NASCAR.data$Date[row]
+     temp <- NASCAR.data[ which(NASCAR.data$Driver==dvr &  
+                                       NASCAR.data$Date<Dte), ]
+     NASCAR.data$Avg5[row] <- mean(tail(temp$Finish,5))
+     
+    
+}
+```
+
+Now let's calculate the drivers average finish at the same track
+```{r}
+
+for (row in 1:nrow(NASCAR.data)) {
+     dvr <- NASCAR.data$Driver[row]
+     Dte <- NASCAR.data$Date[row]
+     trk <- NASCAR.data$Site[row]
+     temp <- NASCAR.data[ which(NASCAR.data$Driver==dvr & 
+                                       NASCAR.data$Date<Dte &
+                                       NASCAR.data$Site == trk), ]
+     NASCAR.data$TrackAvg[row] <- mean(temp$Finish)
+     
+    
+}
+```
+
+Calculate driver's previous average by NASCAR track type
+```{r}
+
+for (row in 1:nrow(NASCAR.data)) {
+     dvr <- NASCAR.data$Driver[row]
+     Dte <- NASCAR.data$Date[row]
+     NSC <- NASCAR.data$NASCAR[row]
+     temp <- NASCAR.data[ which(NASCAR.data$Driver==dvr & 
+                                       NASCAR.data$Date<Dte &
+                                       NASCAR.data$NASCAR == NSC), ]
+     NASCAR.data$NTypeAvg[row] <- mean(temp$Finish)
+     
+    
+}
+```
+
+Calculate driver's previous average by AccuPredict track type
+```{r}
+
+for (row in 1:nrow(NASCAR.data)) {
+     dvr <- NASCAR.data$Driver[row]
+     Dte <- NASCAR.data$Date[row]
+     ACC <- NASCAR.data$AccuPredict[row]
+     temp <- NASCAR.data[ which(NASCAR.data$Driver==dvr & 
+                                       NASCAR.data$Date<Dte &
+                                       NASCAR.data$AccuPredict == ACC), ]
+     NASCAR.data$AccuPredictAvg[row] <- mean(temp$Finish)
+     
+    
+}
+```

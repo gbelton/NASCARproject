@@ -12,7 +12,7 @@ library(dplyr)
 load("NASCARdata.RDa")
 
 #  Get List of Races for year
-GetRaces <- function(year) {
+GetRaces <- function(CurrentYear) {
      url <- paste("http://racing-reference.info/raceyear/", 
                   as.character(year), "/W", sep = "")
      
@@ -42,15 +42,17 @@ GetDrivers <- function(year, race) {
                                    Start = as.numeric(Start),
                                    Laps = as.numeric(Laps),
                                    Led = as.numeric(Led),
-                                   Rating = as.numeric(Rating),
-                                   Winnings = as.numeric(
-                                        gsub("\\$|,", "", Winnings)))
+                                   Rating = as.numeric(Rating))
+                                  # Winnings = as.numeric(
+                                  #      gsub("\\$|,", "", Winnings)))
+     
+     
      return(drivers)
 }
 buildDatabase <- function(year, race) {
      
      #call function GetRaces to get races for specified year
-     #races <- GetRaces(year)
+     races <- GetRaces(year)
      
      # Get Race Data from races table
      # create vectors of length that will match number of drivers in race
@@ -84,30 +86,32 @@ buildDatabase <- function(year, race) {
 }
 
 CurrentYear <- as.numeric(format(Sys.Date(), "%Y"))
+year <- CurrentYear
 LastRaceDate <- max(NASCAR.data$Date)
 LastRaceYear <- as.numeric(format(max(NASCAR.data$Date), "%Y"))
 LastRaceNumber <- NASCAR.data$RaceNo[nrow(NASCAR.data)]
+if (LastRaceYear < CurrentYear) LastRaceNumber <- 0
 
-for (year in LastRaceYear:CurrentYear){
+
      
      # Get data for specified year
      
      races <- GetRaces(year)
      
      if (LastRaceNumber==max(races$RaceNo)) {
-          stop("No new races to add")
-     }
+          stop("No new races to add")}
+     
      for (race in (LastRaceNumber+1):max(races$RaceNo)) {
           race.data <- buildDatabase(year,race)
           
           newcolumns <- c("RaceNo", "Date", "Site", "Cars", "Len", "Sfc","Miles", "Cau", 
                           "Speed", "LC", "Driver", "Finish", "Start", "CarNumber", "Make", 
-                          "Pts", "Laps", "Led", "Status", "Rating", "Winnings", "Team")
+                          "Pts", "Laps", "Led", "Status", "Rating", "Team")
           race.data <- race.data[newcolumns]
           
           NASCAR.data <- rbind(NASCAR.data, race.data)
           remove(race.data)
-     }
+     
 }
 
 # Save result as .csv file

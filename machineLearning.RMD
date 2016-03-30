@@ -1,0 +1,118 @@
+---
+title: "Machine Learning for NASCAR Project"
+author: "Gerald Belton"
+output: html_document
+---
+
+#### Load required libraries
+```{r warning=FALSE, message=FALSE, results='hide'}
+library(caret)
+library(gbm)
+library(plyr)
+```
+
+#### Load training data
+
+```{r }
+load('training-data.RData')
+#training.data$Finish <- as.factor(training.data$Finish)
+training.data$Site <- as.character(training.data$Site)
+training.data$Driver <- as.character(training.data$Driver)
+
+
+```
+
+#### Clean:
+```{r}
+training.data <- training.data[complete.cases(training.data),]
+```
+
+#### Preprocessing
+Divide trainingData into a training set and a test set, with a 60/40 split.
+```{r}
+set.seed(12345)
+inTrain <- createDataPartition(y=training.data$Finish,
+                              p=0.60, list=FALSE);
+training <- training.data[inTrain,]
+testing <- training.data[-inTrain,]
+```
+
+
+#### Model building
+
+Now it's time to teach our model how to recognize the classes of exercises. We will use the **gbm** model, which uses boosted trees.
+
+Caret offers many tuning functions to help get as much as possible out of  models; the ``trainControl`` function allows control of the resampling of the data. This will split the training data set internally and do it's own train/test runs to figure out the best settings for the model. In this case, we're going to cross-validate the data 3 times, therefore training it 3 times on different portions of the data before settling on the best tuning parameters.
+
+```{r}
+set.seed(12345)
+
+Keepers<-c("CareerAvg", "Avg10", "Avg5", "TrackAvg", "NTypeAvg", 
+        "AccuPredictAvg", "RtgAvg10", "Finish")
+Drivers<- training[,"Driver"]
+TrainData <- training[,Keepers]
+
+testing2 <- testing[,Keepers]
+testDrivers <- testing[,"Driver"]
+
+fitControl <- trainControl(method = "cv",
+                           number = 5,
+                           returnResamp = 'none')
+
+modelFit <- train(Finish ~ ., data = TrainData,
+                  method="glmStepAIC",
+                  trControl = fitControl)
+```
+
+
+
+
+#### Evaluation of the model
+
+First, we call the ``summary()`` function to find out which variables were most important.
+
+```{r}
+summary(modelFit)
+```
+
+We can also find out what tuning parameters were most important:
+```{r}
+print(modelFit)
+```
+
+First we will call the ``predict`` function on our training data, and use the **caret** ``postResample`` function to get an accuracy score.
+```{r}
+predictions <- predict(modelFit, training[,Keepers])
+head(predictions)
+print(postResample(pred=predictions, obs=(training[,"Finish"])))
+```
+We can see that the in-sample accuracy is over 97%, so in-sample error rate is less than 3%.
+
+Now we call the ``predict`` function and pass it our trained model and testing data (the testing data which was split from our training set).
+```{r}
+predictions <- predict(modelFit, testing2)
+head(predictions)
+print(postResample(pred=predictions, obs=(testing2[,"Finish"])))
+```
+
+Plot predicted vs actual:
+```{r}
+predictedValues <- predict(modelFit)
+TrainClasses <- testing2$Finish
+plot(testing2$Finish, predictions)
+
+abline(0,0)
+```
+
+
+We see that we have an out-of-sample accuracy of over 96%, and an out-of-sample error rate of less than 4%. 
+
+
+Finally, we will save the pre-processing parameters and the precition model for later use with the testing data for submitting test answers to Coursera. 
+```{r}
+
+save(modelFit, file="modelFit.RData")
+```
+
+
+
