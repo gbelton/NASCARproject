@@ -12,9 +12,8 @@ library(caret)
 library(gbm)
 
 #Load database
-load("~/NASCAR-project/NASCARdata.RDa")
+load("~/R/NASCARproject/NASCARdata.RDa")
 NASCARdata <- NASCAR.data
-
 
 #Reduce to only necessary variables
 keepvars <- c("Date", "Site", "Driver", "Start", "Rating", "Finish")
